@@ -3,9 +3,9 @@ $(document).ready(function() {
     var ladate = new Date();     // on defini la veriable  date
     var year = ladate.getFullYear(); //la valeur de cette date est celle de l'année en cours
     year = year+1;// on incrémente de 1 la valeur de year car l'année demandée est 2018
-    year= year.toString();
 
-    console.log(year);
+
+
 
 
     // Affichage des modeles de la marque selectionnée avec onchange du select
@@ -34,27 +34,35 @@ $(document).ready(function() {
         })
     }
 
-    //function pour les  calculs des taxes sur options et accessoires
 
-    function calc(taxOption, totalOption) {
+    //function pour les  calculs
+    function calc(taxOption, totalOption){
 
         var vh_model = $("#models").val();
         $("#box").html("");
 
-        $.getJSON('vehicules.json', function (data) {
-            $.each(data, function (index, x) {    // on parcour le json
-                if (x.Vehicle_Model === vh_model) {  //si le modèle du select match avect celui du json
+        $.getJSON('vehicules.json', function(data) {
+            $.each(data,  function (index, x) {    // on parcour le json
+                if(x.Vehicle_Model === vh_model){  //si le modèle du select match avect celui du json
 
                     var currentCO2 = x.Vehicle_CO2; // on defini la variable CO2
-                    if (currentCO2 === 360) {        // si CO2 > 360 alors taxRate =50;
-                        var taxRate = 50;
-                    }
+                    // if(currentCO2 === 360){        // si CO2 > 360 alors taxRate =50;
+                    //     var taxRate = 50;
+                    // }
 
-                    $.getJSON('CO2TAX.json', function (data) {
-                        $.each(data['annee'+year], function (index, taxe) {
-                           $("#CO2").append(taxe.TAX);
+                    $.getJSON('CO2TAX.json', function(data) {  //on applique un getjson sur le tableau C02TAX
+                        var arr = [];                          // on initie un tableau vide
+                        $.each(data['annee'+year], function (index, x){      // on parcour CO2TAX
+                            arr.push(x);                       // on injecte (push) le contenu dans le tableau arr initié plus haut
 
                         });
+
+                        for( var i in arr) {              //on boucle sur la clé 2018 du tableau
+                            if (parseInt(arr[i].CO2) === currentCO2) {  //si la valeur du tableau co2 = notre variable CO2,(parseInt pour definir la valeur en interger)
+                                taxRate = arr[i].TAX;                  // on recupere la valeur de la taxe correspondante
+
+                            }
+                        }
 
 
 
@@ -190,15 +198,17 @@ $(document).ready(function() {
                                     0.01));
                                 // calcul destaxes totales
                                 var totaltax = pricetax + totalTaxOption + totalTaxAccess;
+                                totaltax = Math.round(totaltax*100)/100; //  setting to show two decimals places of totalprice that has been calculated.
                                 // calcul prix total vehicule + taxes (vehicule + option + accesssoires)
                                 var totalprice = (x.Vehicle_Price_including_VAT) + pricetax + totalOption + totalAccess;
+                                totalprice = Math.round(totalprice*100)/100; // on arrondi le nombre at  two decimals
 
                                 //affichage des resultats des calculs
-                                $('#box2').html('<br>'+'<strong>TOTAL TAX: ' + totaltax + '<strong>' +
-                                    '<br>' +'<br>'+
+                                $('#box2').html('<br>' + '<strong>TOTAL TAX: ' + totaltax + '<strong>' +
+                                    '<br>' + '<br>' +
                                     '<strong>TOTAL PRICE WITH TAX: ' + totalprice + '</strong>' +
-                                     '<br>'+
-                                     '<strong>UNLIMITED BENEFIT: '+'</strong>')
+                                    '<br>' +
+                                    '<strong>UNLIMITED BENEFIT: ' + '</strong>')
                             }
 
                             calcul();
@@ -206,12 +216,12 @@ $(document).ready(function() {
 
                         }
 
-                    })
+                    });
                 }
-            });
+            })
 
-        })
-    }
+        });
+}
  });
 
 
