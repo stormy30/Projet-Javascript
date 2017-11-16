@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+
     var ladate = new Date();     // on defini la veriable  date
     var year = ladate.getFullYear(); //la valeur de cette date est celle de l'année en cours
     year = year+1;// on incrémente de 1 la valeur de year car l'année demandée est 2018
@@ -203,12 +204,48 @@ $(document).ready(function() {
                                 var totalprice = (x.Vehicle_Price_including_VAT) + pricetax + totalOption + totalAccess;
                                 totalprice = Math.round(totalprice*100)/100; // on arrondi le nombre at  two decimals
 
+
+   //////////////////////////calcul des BENEFITS//
+   // Sachant que '' Accessories are taken into account for the benefit calculation, as well as options.source cahier des charges"
+
+                                // calcul fiscal value for the vehicle
+                                var fiscalValueVehicle = x.Vehicle_Price_including_VAT- 3400;
+
+                                // calcul fiscal value for the option and accesories
+                                var totalPriceAccessOption = totalOption + totalAccess;
+
+
+/////////////tenir compte du cahier des charges :"The resulting value cannot be negative, so discounts apply if base prices greater than the discount."
+                                var fiscalValueAccessOption = totalPriceAccessOption - 850;
+                                 if(fiscalValueAccessOption < 0){
+                                     fiscalValueAccessOption = 0;
+                                 }
+
+
+                                var totalFiscalValue = fiscalValueVehicle + fiscalValueAccessOption;
+                                console.log(totalFiscalValue);
+
+
+                                //BENEFITS
+
+                                var totalfiscalValueRated = totalFiscalValue * 0.014;
+                                    totalfiscalValueRated = Math.floor(totalfiscalValueRated/10) *10;
+                                var unlimitedBenefits = totalfiscalValueRated + 255;
+
+                                // console.log(unlimitedBenefits);
+                                var limitedBenefits = totalfiscalValueRated + 105;
+
+
+
                                 //affichage des resultats des calculs
                                 $('#box2').html('<br>' + '<strong>TOTAL TAX: ' + totaltax + '<strong>' +
                                     '<br>' + '<br>' +
                                     '<strong>TOTAL PRICE WITH TAX: ' + totalprice + '</strong>' +
-                                    '<br>' +
-                                    '<strong>UNLIMITED BENEFIT: ' + '</strong>')
+                                    '<br>' + '<br>'+
+                                    '<strong>UNLIMITED BENEFIT: ' + unlimitedBenefits  + '</strong>' +
+                                    '<br>' + '<br>'+
+                                    '<strong>LIMITED BENEFIT: ' + limitedBenefits  + '</strong>'
+                                )
                             }
 
                             calcul();
